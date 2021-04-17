@@ -1,7 +1,7 @@
 nanomemotools.js
 ================
 
-[![npm version](https://img.shields.io/npm/v/nanote.svg)](https://www.npmjs.com/package/nanote)
+[![npm version](https://img.shields.io/npm/v/nanote.svg)](https://www.npmjs.com/package/nanomemotools)
 ![test workflow](https://github.com/somenano/NanoMemoTools/actions/workflows/test.yml/badge.svg)
 
 Cryptographically secure memos for every Nano block
