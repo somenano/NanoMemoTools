@@ -1,6 +1,9 @@
 nanomemotools.js
 ================
 
+[![npm version](https://img.shields.io/npm/v/nanote.svg)](https://www.npmjs.com/package/nanote)
+![test workflow](https://github.com/somenano/NanoMemoTools/actions/workflows/test.yml/badge.svg)
+
 Cryptographically secure memos for every Nano block
 
 This library allows you to sign, verify signature, encrypt, and decrypt messages with the same keys used to sign a Nano block. It includes multiple modules to assist you in doing offline actions as well as communicating with the [NanoMemo.cc](https://nanomemo.cc) API endpoints. This documentation covers the capabilities of this library. For more details on the RESTful API on [NanoMemo.cc](https://nanomemo.cc) you can view the documentation here: [https://nanomemo.cc/docs/api](https://nanomemo.cc/docs/api).
@@ -28,7 +31,7 @@ also available as a standalone js file in the github repository/dist, [nanomemot
 Usage
 -----
 
-Full documentation is located in the /docs directory or viewable online: (https://somenano.github.io/nanomemotools)
+Full documentation is located in the [/docs](https://github.com/somenano/NanoMemoTools/tree/main/docs) directory or viewable online: (https://somenano.github.io/nanomemotools)
 
 ```javascript
 const NanoMemoTools = require('nanomemotools');
@@ -43,7 +46,7 @@ npm test
 Example
 -------
 
-The /test directory on github has plenty of good examples.
+The [/test](https://github.com/somenano/NanoMemoTools/tree/main/test) directory on github has plenty of good examples.
 
 ## NanoMemoTools.memo
 

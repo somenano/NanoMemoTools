@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
-  "private": true,
+  "private": false,
   "scripts": {
     "test": "mocha --reporter spec",
     "doc": "jsdoc -d docs --configure jsconf.json index.js",
