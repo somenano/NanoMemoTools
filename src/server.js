@@ -25,7 +25,7 @@ const getUserData = async function(api_key, api_secret, endpoint='/api/user') {
         api_key: api_key,
         api_secret: api_secret
     }
-    return post(SERVER + endpoint, data);
+    return network.post(SERVER + endpoint, data);
 }
 
 /**

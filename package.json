@@ -1,7 +1,7 @@
 {
   "name": "nanomemotools",
-  "version": "0.1.2",
-  "description": "",
+  "version": "0.1.3",
+  "description": "Cryptographically secure memos for every Nano block",
   "main": "index.js",
   "private": false,
   "scripts": {
@@ -9,7 +9,15 @@
     "doc": "jsdoc -d docs --configure jsconf.json index.js",
     "browserify": "browserify index.js --s NanoMemoTools > dist/nanomemotools.js"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/somenano/NanoMemoTools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/somenano/NanoMemoTools/issues"
+  },
+  "homepage": "https://nanomemo.cc",
+  "author": "SomeNano",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
