@@ -1,7 +1,7 @@
 nanomemotools.js
 ================
 
-[![npm version](https://img.shields.io/npm/v/nanote.svg)](https://www.npmjs.com/package/nanomemotools)
+[![npm version](https://img.shields.io/npm/v/nanomemotools.svg)](https://www.npmjs.com/package/nanomemotools)
 ![test workflow](https://github.com/somenano/NanoMemoTools/actions/workflows/test.yml/badge.svg)
 
 Cryptographically secure memos for every Nano block
@@ -31,7 +31,7 @@ also available as a standalone js file in the github repository/dist, [nanomemot
 Usage
 -----
 
-Full documentation is located in the [/docs](https://github.com/somenano/NanoMemoTools/tree/main/docs) directory or viewable online: (https://somenano.github.io/nanomemotools)
+Full documentation is located in the [/docs](https://github.com/somenano/NanoMemoTools/tree/main/docs) directory or viewable online: (https://somenano.github.io/NanoMemoTools)
 
 ```javascript
 const NanoMemoTools = require('nanomemotools');
