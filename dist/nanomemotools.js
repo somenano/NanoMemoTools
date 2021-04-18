@@ -5202,8 +5202,8 @@ const WS = require('ws');
 * @param {Object} params data fields to include in POST request
 * @returns {Promise} Promise object represents the data field of a POST request's response
 */
-module.exports.post = async function(url, params) {
-    let response = await axios.post(url, params);
+module.exports.post = async function(url, params, headers={}) {
+    let response = await axios.post(url, params, headers);
     return response.data;
 }
 
@@ -5253,6 +5253,7 @@ module.exports.websocket = async function(url, onopen, onmessage, onclose, onerr
     return ws;
 }
 },{"axios":3,"reconnecting-websocket":33,"ws":35}],38:[function(require,module,exports){
+(function (Buffer){(function (){
 /**
  * NanoMemoTools.node module
  * @module NanoMemoTools/node
@@ -5261,30 +5262,50 @@ module.exports.websocket = async function(url, onopen, onmessage, onclose, onerr
 const network = require('./network');
 
 /**
+ * This function returns a headers object to include in a network.post request
+ * @private
+ * @param {string} username username for auth
+ * @param {string} password password for auth 
+ * @returns 
+ */
+const basicAuth = function(username, password) {
+    let headers = {}
+    if (username && password) {
+        const auth_token = Buffer.from(username +':'+ password, 'utf8').toString('base64');
+        headers = {
+            headers: {
+                'Authorization': 'Basic '+ auth_token
+            }
+        }
+    }
+    return headers;
+}
+
+/**
 * This function requests information of a Nano Block from a given RPC server
 * @public
 * @param {string} hash hash identifier for requested Nano Block
 * @param {string} [url=https://node.somenano.com/proxy] target RPC server to send the request
 * @returns {Promise} Promise object represents the fields returned from an RPC block_info request
 */
-const block_info = function(hash, url='https://node.somenano.com/proxy') {
+const block_info = function(hash, url='https://node.somenano.com/proxy', username=undefined, password=undefined) {
     input = {
         action: 'block_info',
         json_block: true,
         hash: hash
     }
-    return network.post(url, input);
+
+    return network.post(url, input, basicAuth(username, password));
 }
 module.exports.block_info = block_info;
-},{"./network":37}],39:[function(require,module,exports){
+}).call(this)}).call(this,require("buffer").Buffer)
+},{"./network":37,"buffer":44}],39:[function(require,module,exports){
 /**
  * NanoMemoTools.server module
  * @module NanoMemoTools/server
  */
 
-const tools = require('./tools.js');
 const network = require('./network.js');
-const version = require('./version');
 const node = require('./node');
 const Memo = require('./memo.js');
 let SERVER = 'https://nanomemo.cc';
@@ -5456,7 +5477,7 @@ module.exports = {
     websocketSubscribe,
     websocketUnsubscribe
 }
-},{"./memo.js":36,"./network.js":37,"./node":38,"./tools.js":40,"./version":41}],40:[function(require,module,exports){
+},{"./memo.js":36,"./network.js":37,"./node":38}],40:[function(require,module,exports){
 (function (Buffer){(function (){
 /**
  * NanoMemoTools.tools module

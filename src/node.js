@@ -10,7 +10,7 @@ const network = require('./network');
  * @private
  * @param {string} username username for auth
  * @param {string} password password for auth 
- * @returns 
+ * @returns {object} headers object to include in network.post
  */
 const basicAuth = function(username, password) {
     let headers = {}
