@@ -4946,14 +4946,17 @@ const validateHash = function(hash) {
 module.exports.validateHash = validateHash;
 
 /**
- * This function validates a Memo against the Nano Network
+ * This function validates a Memo against the Nano Network; No username/password required if connecting to DEFAULT_SERVER or public API
  * @param {Memo} memo Memo to validate against the Nano Network
+ * @param {string} [url=node.DEFAULT_SERVER] url of Nano Node RPC
+ * @param {string} [username=undefined] username for Nano Node RPC authentication
+ * @param {string} [password=password] password for Nano Node RPC authentication
  * @returns {boolean} True if valid, false if not valid, undefined if corresponding block not found
  */
-const nodeValidated = async function(memo) {
+const nodeValidated = async function(memo, url=node.DEFAULT_SERVER, username=undefined, password=undefined) {
   if (!memo.valid_signature) return false;
 
-  const block = await node.block_info(memo.hash).catch(function(e) {
+  const block = await node.block_info(memo.hash, url, username, password).catch(function(e) {
     console.error('In memo.nodeValidated, an error was caught running node.block_info');
     console.error(e);
     return undefined;
@@ -5262,11 +5265,16 @@ module.exports.websocket = async function(url, onopen, onmessage, onclose, onerr
 const network = require('./network');
 
 /**
+ * Default Nano Node Server
+ */
+const DEFAULT_SERVER = module.exports.DEFAULT_SERVER = 'https://node.somenano.com/proxy';
+
+/**
  * This function returns a headers object to include in a network.post request
  * @private
  * @param {string} username username for auth
  * @param {string} password password for auth 
- * @returns 
+ * @returns {object} headers object to include in network.post
  */
 const basicAuth = function(username, password) {
     let headers = {}
@@ -5285,10 +5293,12 @@ const basicAuth = function(username, password) {
 * This function requests information of a Nano Block from a given RPC server
 * @public
 * @param {string} hash hash identifier for requested Nano Block
-* @param {string} [url=https://node.somenano.com/proxy] target RPC server to send the request
+* @param {string} [url=DEFAULT_SERVER] target RPC server to send the request
+* @param {string} [username=undefined] username for Nano Node RPC authentication
+* @param {string} [password=password] password for Nano Node RPC authentication
 * @returns {Promise} Promise object represents the fields returned from an RPC block_info request
 */
-const block_info = function(hash, url='https://node.somenano.com/proxy', username=undefined, password=undefined) {
+const block_info = function(hash, url=DEFAULT_SERVER, username=undefined, password=undefined) {
     input = {
         action: 'block_info',
         json_block: true,

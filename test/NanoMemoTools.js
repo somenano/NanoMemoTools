@@ -107,6 +107,20 @@ describe("NanoMemoTools.memo", function() {
             expect(NanoMemoTools.memo.validateSignature(signature)).to.equal(true);
             expect(NanoMemoTools.memo.validateSignature('0')).to.equal(false);
         });
+
+        it("Validates memo against Nano Node", async function() {
+            const memo = new NanoMemoTools.memo.Memo(
+                '6E3FD6E599E580FF631AF81477DB72A766D0740F6D81A0DE68F69035CE71D5DD',
+                'This is an example of a non-encrypted message that is sent in a memo',
+                'nano_1k1zfz85cj4p89wib9w74c6brepkkcmf4dp9mqb4pyfsndbjhbu1ch7i4gdx',
+                'fa7c7ee72d7993cbf854585c1bbf305d6a75bfa55a87131aad3b3b1205d257944054fbfca96098a9a6eaa6b84a593f5d174f7696b90dd31b7bf7db8f20e22b0a',
+                NanoMemoTools.version.sign
+            );
+            expect(await NanoMemoTools.memo.nodeValidated(memo)).to.equal(true);
+
+            memo.signature = memo.hash + memo.hash;
+            expect(await NanoMemoTools.memo.nodeValidated(memo)).to.equal(false);
+        });
     });
 
     describe("Memo Class", function() {

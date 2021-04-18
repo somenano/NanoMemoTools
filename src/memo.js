@@ -90,14 +90,17 @@ const validateHash = function(hash) {
 module.exports.validateHash = validateHash;
 
 /**
- * This function validates a Memo against the Nano Network
+ * This function validates a Memo against the Nano Network; No username/password required if connecting to DEFAULT_SERVER or public API
  * @param {Memo} memo Memo to validate against the Nano Network
+ * @param {string} [url=node.DEFAULT_SERVER] url of Nano Node RPC
+ * @param {string} [username=undefined] username for Nano Node RPC authentication
+ * @param {string} [password=password] password for Nano Node RPC authentication
  * @returns {boolean} True if valid, false if not valid, undefined if corresponding block not found
  */
-const nodeValidated = async function(memo) {
+const nodeValidated = async function(memo, url=node.DEFAULT_SERVER, username=undefined, password=undefined) {
   if (!memo.valid_signature) return false;
 
-  const block = await node.block_info(memo.hash).catch(function(e) {
+  const block = await node.block_info(memo.hash, url, username, password).catch(function(e) {
     console.error('In memo.nodeValidated, an error was caught running node.block_info');
     console.error(e);
     return undefined;
