@@ -14,8 +14,8 @@ const WS = require('ws');
 * @param {Object} params data fields to include in POST request
 * @returns {Promise} Promise object represents the data field of a POST request's response
 */
-module.exports.post = async function(url, params) {
-    let response = await axios.post(url, params);
+module.exports.post = async function(url, params, headers={}) {
+    let response = await axios.post(url, params, headers);
     return response.data;
 }
 

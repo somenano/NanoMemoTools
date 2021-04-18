@@ -3,9 +3,7 @@
  * @module NanoMemoTools/server
  */
 
-const tools = require('./tools.js');
 const network = require('./network.js');
-const version = require('./version');
 const node = require('./node');
 const Memo = require('./memo.js');
 let SERVER = 'https://nanomemo.cc';

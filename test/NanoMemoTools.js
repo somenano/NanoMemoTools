@@ -189,3 +189,11 @@ describe("NanoMemoTools.memo", function() {
         });
     });
 });
+
+describe("NanoMemoTools.node", function() {
+    it("Tests RPC block_info", async function() {
+        const hash = '6E3FD6E599E580FF631AF81477DB72A766D0740F6D81A0DE68F69035CE71D5DD';
+        const response = await NanoMemoTools.node.block_info(hash);
+        expect(response.block_account).to.equal('nano_1k1zfz85cj4p89wib9w74c6brepkkcmf4dp9mqb4pyfsndbjhbu1ch7i4gdx');
+    });
+});
