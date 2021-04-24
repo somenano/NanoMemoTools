@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": false,
   "scripts": {
-    "test": "mocha --reporter spec",
+    "test": "mocha --reporter spec --timeout 20000",
     "doc": "jsdoc -d docs --configure jsconf.json index.js",
     "browserify": "browserify index.js --s NanoMemoTools > dist/nanomemotools.js"
   },
