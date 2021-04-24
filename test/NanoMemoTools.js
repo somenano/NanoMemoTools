@@ -100,7 +100,10 @@ describe("NanoMemoTools.memo", function() {
         });
         
         it("Validates message", function() {
-            expect(NanoMemoTools.memo.validateMessage(message)).to.equal(message);
+            expect(NanoMemoTools.memo.validateMessage(message)).to.equal(true);
+            const too_long = Number(1000);
+            const long_message = new Array(too_long + 1).join( '0' );
+            expect(NanoMemoTools.memo.validateMessage(long_message)).to.equal(false);
         });
         
         it("Validates signature", function() {
@@ -116,10 +119,34 @@ describe("NanoMemoTools.memo", function() {
                 'fa7c7ee72d7993cbf854585c1bbf305d6a75bfa55a87131aad3b3b1205d257944054fbfca96098a9a6eaa6b84a593f5d174f7696b90dd31b7bf7db8f20e22b0a',
                 NanoMemoTools.version.sign
             );
-            expect(await NanoMemoTools.memo.nodeValidated(memo)).to.equal(true);
+            // Check valid
+            const v1 = await NanoMemoTools.memo.nodeValidated([memo]);
+            expect(v1.valid.indexOf(memo.hash)).to.equal(0);
+            expect(v1.valid.length).to.equal(1);
+            expect(v1.invalid.length).to.equal(0);
+            expect(v1.not_found.length).to.equal(0);
 
+            // Check invalid TODO - create valid memo with signing key that does not match hash
             memo.signature = memo.hash + memo.hash;
-            expect(await NanoMemoTools.memo.nodeValidated(memo)).to.equal(false);
+            const v2 = await NanoMemoTools.memo.nodeValidated([memo]);
+            expect(v2.invalid.indexOf(memo.hash)).to.equal(0);
+            expect(v2.valid.length).to.equal(0);
+            expect(v2.invalid.length).to.equal(1);
+            expect(v2.not_found.length).to.equal(0);
+
+            // Check not found
+            const memo_not_found = new NanoMemoTools.memo.Memo(
+                '1111111111111111111111111111111111111111111111111111111111111111',
+                'block is not on the Nano Network',
+                'nano_3dx9uf1r153crfjdxhd1ipkmqrjh1zdjdw16c51j4byq8b4671j8raipyxnn',
+                '010c669c00728cc2be25e180a0701d1b50b8eb02b6daf5e9678d78d9174d2a0b32d40bb07494f7e3d3932a47d87b3e3d29fcd46c69f54365c03758786c6f5509',
+                NanoMemoTools.version.sign
+            );
+            const v3 = await NanoMemoTools.memo.nodeValidated([memo_not_found]);
+            expect(v3.not_found.indexOf(memo_not_found.hash)).to.equal(0);
+            expect(v3.valid.length).to.equal(0);
+            expect(v3.invalid.length).to.equal(0);
+            expect(v3.not_found.length).to.equal(1);
         });
     });
 
@@ -209,5 +236,17 @@ describe("NanoMemoTools.node", function() {
         const hash = '6E3FD6E599E580FF631AF81477DB72A766D0740F6D81A0DE68F69035CE71D5DD';
         const response = await NanoMemoTools.node.block_info(hash);
         expect(response.block_account).to.equal('nano_1k1zfz85cj4p89wib9w74c6brepkkcmf4dp9mqb4pyfsndbjhbu1ch7i4gdx');
+    });
+
+    it("Tests RPC blocks_info", async function() {
+        const hashes = [
+            '6E3FD6E599E580FF631AF81477DB72A766D0740F6D81A0DE68F69035CE71D5DD',
+            '69041CEB05587D6823FABAE8BFF2AE8C6D1619E4EA871EDDF5647B88F5EF0A75',
+            '69041CEB05587D6823FABAE8BFF2AE8C6D1619E4EA871EDDF5647B88F5EF0A7'      // Invalid Block
+        ];
+        const response = await NanoMemoTools.node.blocks_info(hashes);
+        expect(response.blocks[hashes[0]].block_account).to.equal('nano_1k1zfz85cj4p89wib9w74c6brepkkcmf4dp9mqb4pyfsndbjhbu1ch7i4gdx');
+        expect(response.blocks[hashes[1]].block_account).to.equal('nano_1k1zfz85cj4p89wib9w74c6brepkkcmf4dp9mqb4pyfsndbjhbu1ch7i4gdx');
+        expect(response.blocks_not_found[0]).to.equal(hashes[2]);
     });
 });

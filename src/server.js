@@ -4,7 +4,6 @@
  */
 
 const network = require('./network.js');
-const node = require('./node');
 const Memo = require('./memo.js');
 let SERVER = 'https://nanomemo.cc';
 let WSS = 'wss://nanomemo.cc';
@@ -12,12 +11,12 @@ let WSS = 'wss://nanomemo.cc';
 /**
 * This function gathers user data from the server
 * @public
-* @param {string} api_key user public api key
-* @param {string} api_secret user private secret key
+* @param {string} [api_key=undefined] user public api key; if undefined uses IP rate limiting
+* @param {string} [api_secret=undefined] user private secret key; if undefined uses IP rate limiting
 * @param {string} [endpoint=/api/user/] endpoint of POST request
 * @returns {Promise} Promise object represents the user data as an object
 */
-const getUserData = async function(api_key, api_secret, endpoint='/api/user') {
+const getUserData = async function(api_key=undefined, api_secret=undefined, endpoint='/api/user') {
     
     const data = {
         api_key: api_key,
@@ -29,17 +28,16 @@ const getUserData = async function(api_key, api_secret, endpoint='/api/user') {
 /**
 * This function gathers a memo's data from the server
 * @public
-* @param {string} hash 64-hex hash that represents a Nano Block
-* @param {string} [endpoint=/api/memo/block/] endpoint of POST request
-* @returns {Promise} Promise object represents the memo object 
+* @param {array} hashes array of 64-hex hash that represents a Nano Block
+* @param {string} [server=SERVER] server to POST
+* @param {string} [endpoint=/api/memo/blocks/] endpoint of POST request
+* @returns {Promise} Promise object represents array of Memo objectsthe memo object 
 */
-const getMemo = async function(hash, endpoint='/api/memo/block/') {
-    if (!Memo.validateHash(hash)) {
-        console.error('In NanoMemoTools.server.getMemo, hash failed validation');
-        return undefined;
-    }
+const getMemos = async function(hashes, server=SERVER, endpoint='/api/memo/blocks/') {
 
-    let response = await network.get(SERVER + endpoint + hash);
+    let response = await network.post(server + endpoint, {
+        hashes: hashes
+    });
     if (response === undefined || response === null) {
         return {
             success: false,
@@ -49,34 +47,42 @@ const getMemo = async function(hash, endpoint='/api/memo/block/') {
     }
     if (response.error !== undefined) return response;
 
-    // Get corresponding block data
-    const block = await node.block_info(response.data.hash).catch(function(e) {
-        console.error('In NanoMemoTools.server.getMemo, error caught when running node.block_info for hash: '+ response.data.hash);
-        console.error(e);
-        return undefined;
-    });
-    if (block === undefined || block === null) {
-        console.error('In NanoMemoTools.server.getMemo, no block data returned for hash: '+ response.data.hash);
-        return undefined;
+    // Create Memo objects
+    let memos = [];
+    for (let memo_data of response.data) {
+        let memo = undefined;
+        if (memo_data.version_encrypt !== undefined) {
+            // Yes, encrypted
+            memo = new Memo.EncryptedMemo(
+                memo_data.hash,
+                memo_data.message,
+                memo_data.signing_address,
+                memo_data.decrypting_address,
+                memo_data.signature,
+                memo_data.version_sign,
+                memo_data.version_encrypt
+            );
+        } else {
+            // No, not encrypted
+            memo = new Memo.Memo(
+                memo_data.hash,
+                memo_data.message,
+                memo_data.signing_address,
+                memo_data.signature,
+                memo_data.version_sign
+            );
+        }
+
+        // Validate signature locally
+        if (!memo.valid_signature) {
+            console.error('In NanoMemoTools.server.getMemos, memo signature validation failed for hash '+ memo.hash);
+            continue;
+        }
+
+        memos.push(memo);
     }
 
-    // Create Memo Object
-    let memo = undefined;
-    if (response.version_encrypt !== undefined) {
-        // Yes, encrypted
-        memo = new Memo.EncryptedMemo(response.data.hash, response.data.message, response.data.signing_address, response.data.decrypting_address, response.data.signature, response.data.version_sign, response.data.version_encrypt);
-    } else {
-        // No, not encrypted
-        memo = new Memo.Memo(response.data.hash, response.data.message, response.data.signing_address, response.data.signature, response.data.version_sign);
-    }
-
-    // Validate signature locally
-    if (!memo.valid_signature) {
-        console.error('In NanoMemoTools.server.getMemo, memo signature validation failed');
-        return undefined;
-    }
-
-    return memo;
+    return memos;
 }
 
 /**
@@ -85,10 +91,11 @@ const getMemo = async function(hash, endpoint='/api/memo/block/') {
 * @param {Memo.Memo} memo memo data to be saved to the server
 * @param {string} api_key public api key
 * @param {string} api_secret private api key
+* @param {string} [server=SERVER] server to POST
 * @param {string} [endpoint=/api/memo/new/] endpoint of POST request
 * @returns {Promise} Promise object represents the memo object 
 */
-const saveMemo = async function(memo, api_key, api_secret, endpoint='/api/memo/new') {
+const saveMemo = async function(memo, api_key, api_secret, server=SERVER, endpoint='/api/memo/new') {
 
     if (!memo.valid_signature) {
         console.error('Memo has an invalid signature');
@@ -99,7 +106,9 @@ const saveMemo = async function(memo, api_key, api_secret, endpoint='/api/memo/n
         }
     }
 
-    const response = await network.post(SERVER + endpoint, {
+    console.log(server + endpoint);
+
+    const response = await network.post(server + endpoint, {
         api_key: api_key,
         api_secret: api_secret,
         message: memo.message,
@@ -170,8 +179,8 @@ const websocketUnsubscribe = async function() {
 
 module.exports = {
     getUserData,
-    getMemo,
+    getMemos,
     saveMemo,
     websocketSubscribe,
-    websocketUnsubscribe
+    websocketUnsubscribe,
 }

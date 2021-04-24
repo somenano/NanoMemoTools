@@ -1,6 +1,6 @@
 {
   "name": "nanomemotools",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Cryptographically secure memos for every Nano block",
   "main": "index.js",
   "private": false,

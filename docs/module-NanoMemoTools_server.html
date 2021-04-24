@@ -144,7 +144,7 @@
     
 
     
-    <h4 class="name" id="~getMemo"><span class="type-signature">(async, inner) </span>getMemo<span class="signature">(hash, endpoint<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="~getMemos"><span class="type-signature">(async, inner) </span>getMemos<span class="signature">(hashes, server<span class="signature-attributes">opt</span>, endpoint<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -192,13 +192,13 @@
 
         <tr>
             
-                <td class="name"><code>hash</code></td>
+                <td class="name"><code>hashes</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">array</span>
 
 
             
@@ -220,7 +220,46 @@
                 </td>
             
 
-            <td class="description last">64-hex hash that represents a Nano Block</td>
+            <td class="description last">array of 64-hex hash that represents a Nano Block</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>server</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    SERVER
+                
+                </td>
+            
+
+            <td class="description last">server to POST</td>
         </tr>
 
     
@@ -254,7 +293,7 @@
             
                 <td class="default">
                 
-                    /api/memo/block/
+                    /api/memo/blocks/
                 
                 </td>
             
@@ -329,7 +368,7 @@
 
         
 <div class="param-desc">
-    Promise object represents the memo object
+    Promise object represents array of Memo objectsthe memo object
 </div>
 
 
@@ -358,7 +397,7 @@
     
 
     
-    <h4 class="name" id="~getUserData"><span class="type-signature">(async, inner) </span>getUserData<span class="signature">(api_key, api_secret, endpoint<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="~getUserData"><span class="type-signature">(async, inner) </span>getUserData<span class="signature">(api_key<span class="signature-attributes">opt</span>, api_secret<span class="signature-attributes">opt</span>, endpoint<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -421,6 +460,8 @@
             
                 <td class="attributes">
                 
+                    &lt;optional><br>
+                
 
                 
 
@@ -434,7 +475,7 @@
                 </td>
             
 
-            <td class="description last">user public api key</td>
+            <td class="description last">user public api key; if undefined uses IP rate limiting</td>
         </tr>
 
     
@@ -456,6 +497,8 @@
             
                 <td class="attributes">
                 
+                    &lt;optional><br>
+                
 
                 
 
@@ -469,7 +512,7 @@
                 </td>
             
 
-            <td class="description last">user private secret key</td>
+            <td class="description last">user private secret key; if undefined uses IP rate limiting</td>
         </tr>
 
     
@@ -549,7 +592,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_server.js.html">src/server.js</a>, <a href="src_server.js.html#line20">line 20</a>
+        <a href="src_server.js.html">src/server.js</a>, <a href="src_server.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -607,7 +650,7 @@
     
 
     
-    <h4 class="name" id="~saveMemo"><span class="type-signature">(async, inner) </span>saveMemo<span class="signature">(memo, api_key, api_secret, endpoint<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="~saveMemo"><span class="type-signature">(async, inner) </span>saveMemo<span class="signature">(memo, api_key, api_secret, server<span class="signature-attributes">opt</span>, endpoint<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -760,6 +803,45 @@
 
         <tr>
             
+                <td class="name"><code>server</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    SERVER
+                
+                </td>
+            
+
+            <td class="description last">server to POST</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>endpoint</code></td>
             
 
@@ -833,7 +915,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_server.js.html">src/server.js</a>, <a href="src_server.js.html#line91">line 91</a>
+        <a href="src_server.js.html">src/server.js</a>, <a href="src_server.js.html#line98">line 98</a>
     </li></ul></dd>
     
 
@@ -992,7 +1074,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_server.js.html">src/server.js</a>, <a href="src_server.js.html#line123">line 123</a>
+        <a href="src_server.js.html">src/server.js</a>, <a href="src_server.js.html#line132">line 132</a>
     </li></ul></dd>
     
 
@@ -1102,7 +1184,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_server.js.html">src/server.js</a>, <a href="src_server.js.html#line163">line 163</a>
+        <a href="src_server.js.html">src/server.js</a>, <a href="src_server.js.html#line172">line 172</a>
     </li></ul></dd>
     
 
@@ -1164,7 +1246,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sat Apr 17 2021 21:33:25 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Apr 23 2021 22:24:05 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

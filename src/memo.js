@@ -17,13 +17,11 @@ const NanoCurrency = require('nanocurrency');
 */
 const validateMessage = function(message, maxlength=512) {
   try {
-      message = message.toString('ascii');
-
-      if (message.length > maxlength) return false;
-
-      return message;
-  } catch {
-      return false;
+    message = message.toString('ascii');
+    if (message.length > maxlength) return false;
+    return true;
+  } catch(e) {
+    return false;
   }
 }
 module.exports.validateMessage = validateMessage;
@@ -38,7 +36,7 @@ const validateSignature = function(signature) {
   try {
       if (signature.length != 128) return false;
       return true;
-  } catch {
+  } catch(e) {
       return false;
   }
 }
@@ -53,7 +51,7 @@ module.exports.validateSignature = validateSignature;
 const validateKey = function(key) {
   try {
       return NanoCurrency.checkKey(key);
-  } catch {
+  } catch(e) {
       return false;
   }
 }
@@ -68,7 +66,7 @@ module.exports.validateKey = validateKey;
 const validateAddress = function(address) {
   try {
       return NanoCurrency.checkAddress(address);
-  } catch {
+  } catch(e) {
       return false;
   }
 }
@@ -83,39 +81,74 @@ module.exports.validateAddress = validateAddress;
 const validateHash = function(hash) {
   try {
       return NanoCurrency.checkHash(hash);
-  } catch {
+  } catch(e) {
       return false;
   }
 }
 module.exports.validateHash = validateHash;
 
 /**
- * This function validates a Memo against the Nano Network; No username/password required if connecting to DEFAULT_SERVER or public API
- * @param {Memo} memo Memo to validate against the Nano Network
+ * This function validates one or more Memos against the Nano Network; No username/password required if connecting to DEFAULT_SERVER or public API
+ * @param {array} memos Array of Memos to validate against the Nano Network
  * @param {string} [url=node.DEFAULT_SERVER] url of Nano Node RPC
  * @param {string} [username=undefined] username for Nano Node RPC authentication
  * @param {string} [password=password] password for Nano Node RPC authentication
- * @returns {boolean} True if valid, false if not valid, undefined if corresponding block not found
+ * @returns {object} { valid: [<array of hashes>], invalid: [<array of hashes>], not_found: [<array of hashes>] }; returns undefined on error
  */
-const nodeValidated = async function(memo, url=node.DEFAULT_SERVER, username=undefined, password=undefined) {
-  if (!memo.valid_signature) return false;
+ const nodeValidated = async function(memos, url=node.DEFAULT_SERVER, username=undefined, password=undefined) {
 
-  const block = await node.block_info(memo.hash, url, username, password).catch(function(e) {
-    console.error('In memo.nodeValidated, an error was caught running node.block_info');
+  let ret = {
+    valid: [],
+    invalid: [],
+    not_found: []
+  }
+
+  let local_valid_memos = [];
+  let local_invalid_memos = [];
+  for (let memo of memos) {
+    if (memo.valid_signature) local_valid_memos.push(memo);
+    else local_invalid_memos.push(memo.hash);
+  }
+
+  // Return early if there are no valid memos to check
+  // if (local_valid_memos.length == 0) return ret;
+
+  // Query node
+  const response = await node.blocks_info(memos.map(memo => memo.hash), url, username, password).catch(function(e) {
+    console.error('In memo.nodeValidated, an error was caught running node.blocks_info');
+    console.error(memos.map(memo => memo.hash));
     console.error(e);
     return undefined;
   });
-  if (!block || !block.block_account) {
-      // hash not found on Nano Network, return undefined
-      return undefined;
+  if (!response || (!response.blocks && !response.blocks_not_found)) {
+    // Invalid response
+    console.error('In memo.nodeValidate, no response was received from node.blocks_info');
+    return undefined;
   }
+  if (response.blocks == '') response.blocks = {};
+  if (response.blocks_not_found == '') response.blocks_not_found = {};
 
   // Memo has already been validated with the signing_address
   // Don't compare addresses because nano_ or xrb_ prefixes may not match, so convert to public key
   //  and compare to be same
-  if (tools.getPublicKeyFromAddress(memo.signing_address).toUpperCase() == tools.getPublicKeyFromAddress(block.block_account).toUpperCase()) return true;
+  for (let memo of memos) {
 
-  return false;
+    if (response.blocks[memo.hash] !== undefined) {
+      // Block exists exists on the Nano Network
+      const block = response.blocks[memo.hash];
+      const block_signing_public_key = tools.getPublicKeyFromAddress(block.block_account);
+      if (memo.valid_signature && memo.signing_public_key.toUpperCase() == block_signing_public_key.toUpperCase()) {
+        // Memo is valid and matches keys with the block
+        ret.valid.push(memo.hash);
+      } else {
+        ret.invalid.push(memo.hash);
+      }
+    } else {
+      ret.not_found.push(memo.hash);
+    }
+  }
+
+  return ret;
 }
 module.exports.nodeValidated = nodeValidated;
 
